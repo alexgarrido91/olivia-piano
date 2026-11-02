@@ -344,51 +344,102 @@
       }
       .sheet .foot { color: var(--ink-soft); font-size: 13.5px; line-height: 1.6; border-top: 1px solid var(--panel-border); padding-top: 14px; margin-top: 4px; }
 
-      /* ---------- Vista de práctica a pantalla completa (de lado, tipo Simply Piano / Yousician) ---------- */
+      /* ---------- Vista de práctica a pantalla completa (de lado, tipo Yousician) ---------- */
       .play-shell {
-        position: fixed; inset: 0; z-index: 80; background: var(--stage);
+        position: fixed; inset: 0; z-index: 80;
+        background: linear-gradient(180deg, #1a2c86 0%, #101f6e 55%, #08124a 100%);
         display: flex; flex-direction: column;
         height: 100vh; height: 100dvh;
         overscroll-behavior: none;
         padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
       }
       .play-shell[hidden] { display: none; }
-      /* Giro forzado: si el teléfono está en vertical (rotación bloqueada o dentro
-         de un visor que no gira), la vista se gira 90° sola, como en Simply Piano.
-         El usuario solo tiene que voltear el teléfono; no depende del sistema. */
-      .play-shell.force-rotated {
-        inset: auto;
-        width: 100vh; width: 100dvh;
-        height: 100vw; height: 100dvw;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%) rotate(90deg);
-      }
+      /* SIN giro forzado: antes la vista se rotaba 90° con CSS y en el teléfono
+         todo quedaba de lado e ilegible (teclado vertical, texto torcido). Ahora
+         la vista es horizontal de verdad: usa el viewport tal cual lo entrega el
+         teléfono ya girado, como Yousician. Si el teléfono sigue en
+         vertical, se muestra el aviso .rotate-gate, no contenido torcido. */
       body.playing { overflow: hidden; }
       .play-top {
-        display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-        padding: 8px 12px; background: var(--stage-2); border-bottom: 1px solid var(--stage-line);
-        color: #f5eeda;
+        display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;
+        padding: 6px 12px; background: rgba(5, 9, 40, 0.66); border-bottom: 1px solid rgba(130, 160, 255, 0.25);
+        color: #f5eeda; flex: none; overflow: hidden;
       }
       .play-exit {
         font-family: "Sora", sans-serif; font-weight: 800; font-size: 13.5px;
         background: var(--note); color: #241a05; border: none; border-radius: 999px;
-        padding: 8px 14px; cursor: pointer;
+        padding: 8px 14px; cursor: pointer; flex: none;
       }
-      .play-title { font-family: "Sora", sans-serif; font-weight: 800; font-size: 15.5px; }
-      .play-legend { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; color: #cfc4a4; }
+      .play-pause {
+        font-family: "Sora", sans-serif; font-weight: 800; font-size: 13.5px;
+        background: transparent; color: #ffd166; border: 1.5px solid var(--stage-line); border-radius: 999px;
+        padding: 7px 13px; cursor: pointer; flex: none;
+      }
+      .play-title { font-family: "Sora", sans-serif; font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .play-legend { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; color: #cfc4a4; white-space: nowrap; }
       .play-legend .dot { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
       .play-legend .dot-r { background: #e8a33d; }
       .play-legend .dot-l { background: #35b6ac; margin-left: 8px; }
-      .play-hud { display: flex; gap: 14px; margin-left: auto; font-size: 13px; font-weight: 600; color: #cfc4a4; }
-      .play-hud strong { font-family: "Sora", sans-serif; color: #ffd166; font-size: 15px; }
+      @media (max-width: 700px) { .play-legend { display: none; } }
+      .play-hud { display: flex; gap: 12px; margin-left: auto; font-size: 12.5px; font-weight: 600; color: #cfc4a4; white-space: nowrap; }
+      .play-hud strong { font-family: "Sora", sans-serif; color: #ffd166; font-size: 14.5px; }
       .play-stage { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-      .play-shell .stage-card { flex: 1; display: flex; flex-direction: column; min-height: 0; border-radius: 0; border: none; box-shadow: none; }
+      .play-shell .stage-card { flex: 1; display: flex; flex-direction: column; min-height: 0; border-radius: 0; border: none; box-shadow: none; background: transparent; }
       .play-shell .stage-wrap { flex: 1; min-height: 0; }
       .play-shell canvas#highway { height: 100%; }
-      .play-shell .stage-top { padding: 8px 12px; }
-      .play-shell .keyboard-card { margin-top: 0 !important; border-radius: 0; border: none; border-top: 3px solid var(--accent); box-shadow: none; padding: 0; flex: none; }
-      .play-shell .keyboard { height: clamp(118px, 30vh, 205px); }
+      /* En horizontal manda el juego: fuera las filas de opciones y controles que
+         amontonaban el escenario y empujaban el teclado fuera de sitio. Se
+         ajustan en la vista normal, antes de entrar; aquí quedan Empezar/Pausa
+         en la barra superior y en el cartel del escenario. */
+      .play-shell .practice-opts { display: none; }
+      .play-shell .stage-controls { display: none; }
+      .play-shell .stage-top { padding: 6px 12px; flex-wrap: nowrap; overflow: hidden; background: rgba(5, 9, 40, 0.5); border-bottom: 1px solid rgba(130, 160, 255, 0.22); }
+      .play-shell .pl { background: rgba(9, 16, 58, 0.85); border-color: rgba(130, 160, 255, 0.35); color: #d7e2ff; }
+      .play-shell .pl.done { background: #274435; color: #9fe3bb; border-color: #35684c; }
+      .play-shell .pl.current { background: var(--note-wait); color: #241a05; border-color: var(--note-wait); }
+      .play-shell .phrase-lyric { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 15px; }
+      .play-shell .phrase-letters { flex-wrap: nowrap; overflow: hidden; }
+      .play-shell .stage-overlay { padding: 12px; gap: 9px; background: rgba(5, 9, 38, 0.8); }
+      .play-shell .stage-overlay h2 { font-size: clamp(18px, 3.4vw, 24px); }
+      .play-shell .stage-overlay p { font-size: 13.5px; max-width: 520px; }
+      .play-shell .stage-overlay .big-btn { padding: 11px 26px; font-size: 16px; }
+      /* Teclado abajo, a todo lo ancho, con su altura tomada del alto real de la
+         pantalla ya girada (dvh): ni gigante ni aplastado. */
+      .play-shell .keyboard-card { margin-top: 0 !important; border-radius: 0; border: none; border-top: 3px solid #8fb4ff; box-shadow: 0 -10px 30px rgba(110, 150, 255, 0.35); padding: 0; flex: none; background: #04061c; }
+      .play-shell .keyboard { height: clamp(112px, 34dvh, 190px); }
+      .play-shell .wkey { border-bottom: 5px solid #a49c8a; }
       .play-shell .kb-hint { display: none; }
+      .play-shell .rotate-gate { background: linear-gradient(180deg, #18297e 0%, #08124a 100%); }
+      /* Barra inferior de la vista de lado, como en la referencia: pausa a la
+         izquierda, progreso de la canción en el centro y guía de manos a la
+         derecha (dorada = derecha, verde azulada = izquierda). */
+      .play-foot {
+        display: flex; align-items: center; gap: 14px; flex: none;
+        padding: 8px 14px; background: rgba(4, 8, 36, 0.88);
+        border-top: 1px solid rgba(130, 160, 255, 0.18);
+      }
+      .play-progress { flex: 1; height: 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.13); overflow: hidden; }
+      .play-progress-fill { height: 100%; width: 0%; background: #57c785; border-radius: 999px; transition: width .25s ease; }
+      .play-counter { font-family: "Sora", sans-serif; font-weight: 800; font-size: 15px; color: #ffffff; white-space: nowrap; }
+      .hand-guides { display: flex; gap: 9px; align-items: center; flex: none; }
+      .hg { opacity: .25; filter: grayscale(.6); line-height: 0; transition: opacity .2s ease; }
+      .hg.on { opacity: 1; filter: none; }
+      .hg-left { color: #35b6ac; }
+      .hg-right { color: #e8a33d; }
+      .hg-left svg { transform: scaleX(-1); }
+      /* Aviso "gira tu teléfono": solo aparece si la vista de lado se abre con el
+         teléfono todavía en vertical. En cuanto el teléfono gira, desaparece solo. */
+      .rotate-gate {
+        position: absolute; inset: 0; z-index: 6; display: none;
+        flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+        text-align: center; padding: 24px; background: var(--stage); color: #f5eeda;
+      }
+      @media (orientation: portrait) { .play-shell .rotate-gate { display: flex; } }
+      .rotate-gate .phone-anim { font-size: 52px; line-height: 1; display: inline-block; animation: tiltPhone 2.2s ease-in-out infinite; }
+      @keyframes tiltPhone { 0%, 25% { transform: rotate(0deg); } 60%, 100% { transform: rotate(90deg); } }
+      @media (prefers-reduced-motion: reduce) { .rotate-gate .phone-anim { animation: none; transform: rotate(90deg); } }
+      .rotate-gate h2 { font-family: "Sora", sans-serif; margin: 0; font-size: 22px; }
+      .rotate-gate p { margin: 0; color: #cfc4a4; max-width: 420px; font-size: 14.5px; line-height: 1.55; }
 
       /* ---------- Nivel, XP y sesión ---------- */
       .stats-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px; padding: 10px 16px; margin-bottom: 12px; box-shadow: var(--shadow); font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
@@ -450,12 +501,12 @@
         <h1>Olivia Piano</h1>
         <span class="chip" id="soundChip">🔇 Toca una tecla para activar el sonido</span>
       </div>
-      <p class="lib-sub"><strong>Elige tu canción o lección.</strong> Toca una tarjeta para cargarla en el piano. Todo lo que elijas se practica igual: notas que caen en el modo Aprender, reproducción automática en Escuchar, y tu piano MIDI cuenta igual que las teclas en pantalla. Si empiezas de cero, sigue el <strong>Curso desde el principio</strong> en orden: dedos y posición Do, mano derecha, mano izquierda, las dos manos juntas, acordes e independencia. Ahora también puedes <strong>cambiar el color de la app</strong> abajo y ver cómo <strong>instalarla en tu teléfono</strong> como app, sin App Store. Y como en Simply Piano y Yousician: ganas <strong>estrellas, XP y niveles</strong>, y dentro del escenario puedes practicar <strong>por secciones</strong>, elegir <strong>mano derecha o izquierda</strong> (la otra la toca la app) y activar el <strong>metrónomo</strong>.</p>
+      <p class="lib-sub"><strong>Elige tu canción o lección.</strong> Toca una tarjeta para cargarla en el piano. Todo lo que elijas se practica igual: notas que caen en el modo Aprender, reproducción automática en Escuchar, y tu piano MIDI cuenta igual que las teclas en pantalla. Si empiezas de cero, sigue el <strong>Curso desde el principio</strong> en orden: dedos y posición Do, mano derecha, mano izquierda, las dos manos juntas, acordes e independencia. Ahora también puedes <strong>cambiar el color de la app</strong> abajo y ver cómo <strong>instalarla en tu teléfono</strong> como app, sin App Store. Y como en Yousician: ganas <strong>estrellas, XP y niveles</strong>, y dentro del escenario puedes practicar <strong>por secciones</strong>, elegir <strong>mano derecha o izquierda</strong> (la otra la toca la app) y activar el <strong>metrónomo</strong>.</p>
 
       <div class="view-bar">
         <button class="view-btn" id="orientationBtn" type="button">⛶ Tocar de lado (pantalla completa)</button>
         <button class="install-btn" id="installAppBtn" type="button">📲 Instalar como app</button>
-        <span class="view-hint">Como en Simply Piano: el piano ocupa toda la pantalla, con las notas cayendo directo sobre las teclas. La vista <strong>se gira sola aunque tu teléfono tenga bloqueada la rotación</strong>: pulsa el botón y voltea el teléfono, no tienes que desbloquear nada. Si giras el teléfono de lado, también entra sola.</span>
+        <span class="view-hint">Como en Yousician: pulsa el botón y <strong>gira el teléfono de lado</strong>: el teclado queda abajo a todo lo ancho, con las teclas grandes de la canción, y las notas caen justo sobre cada tecla, con todo el texto derecho. Si tienes la rotación bloqueada, desbloquéala para que la pantalla pueda girar. Si giras el teléfono sin pulsar el botón, la vista también entra sola.</span>
       </div>
 
       <div class="stats-bar" aria-label="Tu sesión">
@@ -535,7 +586,7 @@
           </div>
         </div>
 
-        <div style="padding: 12px 14px 14px;">
+        <div class="stage-controls" style="padding: 12px 14px 14px;">
           <div class="progress-row" style="margin-top:0;">
             <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
             <div class="progress-label" id="progressLabel">Nota 0 de 31</div>
@@ -632,6 +683,8 @@
     <div class="play-shell" id="playShell" hidden>
       <div class="play-top">
         <button class="play-exit" id="playExitBtn" type="button">✕ Salir</button>
+        <button class="play-pause" id="playPauseMini" type="button">▶ Empezar</button>
+        <span class="play-counter" id="playCounter">0/31</span>
         <span class="play-title" id="playTitle">Olivia Piano</span>
         <span class="play-legend"><span class="dot dot-r"></span>Mano derecha<span class="dot dot-l"></span>Mano izquierda</span>
         <div class="play-hud" aria-label="Marcador">
@@ -642,6 +695,20 @@
         </div>
       </div>
       <div class="play-stage" id="playStage"></div>
+      <div class="play-foot">
+        <button class="play-pause" id="playPauseFoot" type="button">▶ Empezar</button>
+        <div class="play-progress" aria-hidden="true"><div class="play-progress-fill" id="playProgressFill"></div></div>
+        <div class="hand-guides" role="img" aria-label="Guía de manos: la dorada es la mano derecha y la verde azulada la izquierda; se enciende la mano que estás practicando">
+          <span class="hg hg-left on" id="hgLeft"><svg viewBox="0 0 48 48" width="27" height="27" fill="currentColor" aria-hidden="true"><rect x="10" y="20" width="28" height="20" rx="7"/><rect x="11" y="13" width="6" height="15" rx="3"/><rect x="18.5" y="6" width="6" height="21" rx="3"/><rect x="26" y="8.5" width="6" height="19" rx="3"/><rect x="31.5" y="12.5" width="6" height="15" rx="3"/><rect x="2" y="22" width="6.5" height="14" rx="3.25" transform="rotate(35 5.25 29)"/></svg></span>
+          <span class="hg hg-right on" id="hgRight"><svg viewBox="0 0 48 48" width="27" height="27" fill="currentColor" aria-hidden="true"><rect x="10" y="20" width="28" height="20" rx="7"/><rect x="11" y="13" width="6" height="15" rx="3"/><rect x="18.5" y="6" width="6" height="21" rx="3"/><rect x="26" y="8.5" width="6" height="19" rx="3"/><rect x="31.5" y="12.5" width="6" height="15" rx="3"/><rect x="2" y="22" width="6.5" height="14" rx="3.25" transform="rotate(35 5.25 29)"/></svg></span>
+        </div>
+      </div>
+      <div class="rotate-gate" id="rotateGate">
+        <span class="phone-anim" aria-hidden="true">📱</span>
+        <h2>Gira tu teléfono de lado</h2>
+        <p>Olivia Piano se toca en horizontal, como en Yousician: el teclado queda abajo a todo lo ancho y las notas caen justo sobre las teclas. Gira el teléfono y la vista se acomoda sola, con todo el texto derecho. Si la pantalla no gira, desbloquea la rotación en tu teléfono.</p>
+        <button class="play-exit" id="gateExitBtn" type="button">✕ Salir</button>
+      </div>
     </div>
 
     <script>
@@ -971,12 +1038,15 @@
 
       /* ============ Teclado ============ */
       var NOTE_NAMES = { 0: "C", 1: "C#", 2: "D", 3: "D#", 4: "E", 5: "F", 6: "F#", 7: "G", 8: "G#", 9: "A", 10: "Bb", 11: "B" };
-      var LOW = 41, HIGH = 72; /* F2 a C5: hay notas graves para la mano izquierda */
+      var FULL_LOW = 41, FULL_HIGH = 72; /* F2 a C5: hay notas graves para la mano izquierda */
+      var LOW = FULL_LOW, HIGH = FULL_HIGH;
       var kbEl = document.getElementById("keyboard");
       var keyEls = {};   /* midi -> elemento */
       var keyGeo = {};   /* midi -> {x, w, black} en px relativos al teclado */
       var whiteCount = 0;
-      (function buildKeyboard() {
+      function buildKeyboard() {
+        kbEl.innerHTML = "";
+        keyEls = {}; keyGeo = {}; whiteCount = 0;
         var m;
         for (m = LOW; m <= HIGH; m++) { if (!isBlack(m)) whiteCount++; }
         for (m = LOW; m <= HIGH; m++) {
@@ -996,12 +1066,38 @@
           kbEl.appendChild(bb); keyEls[m] = bb;
         }
         layoutKeys();
-      })();
+        if (typeof updateSongRange === "function") updateSongRange();
+      }
+      buildKeyboard();
+      /* Zoom del teclado al estilo Yousician: en la vista de lado solo se ven las
+         teclas que usa la canción (de Do a Do, con un mínimo cómodo), grandes y
+         a todo lo ancho, en vez de las 19 blancas del teclado completo apretadas. */
+      function countWhites(lo, hi) { var c = 0; for (var m = lo; m <= hi; m++) if (!isBlack(m)) c++; return c; }
+      function zoomKeyboardToSong() {
+        if (!currentEntry || !currentEntry.phrases) return;
+        var min = 999, max = -1;
+        currentEntry.phrases.forEach(function (ph) {
+          ph.notes.forEach(function (n) { if (n.midi < min) min = n.midi; if (n.midi > max) max = n.midi; });
+        });
+        if (max < 0) return;
+        var lo = min - (min % 12);            /* bajar al Do de esa octava */
+        var hi = max + ((12 - (max % 12)) % 12); /* subir al Do siguiente */
+        if (hi === max) hi = max;
+        while (countWhites(lo, hi) < 24 && hi + 12 <= 84) hi += 12;
+        while (countWhites(lo, hi) < 24 && lo - 12 >= 24) lo -= 12;
+        if (lo === LOW && hi === HIGH) return;
+        LOW = lo; HIGH = hi;
+        buildKeyboard();
+      }
+      function restoreFullKeyboard() {
+        if (LOW === FULL_LOW && HIGH === FULL_HIGH) return;
+        LOW = FULL_LOW; HIGH = FULL_HIGH;
+        buildKeyboard();
+      }
       function isBlack(m) { var n = m % 12; return n === 1 || n === 3 || n === 6 || n === 8 || n === 10; }
       function layoutKeys() {
-        /* clientWidth = ancho de layout, sin transformar: correcto también cuando
-           la vista de lado va girada 90° con CSS (getBoundingClientRect daría el
-           cuadro ya girado y descuadraría las teclas del lienzo). */
+        /* clientWidth = ancho de layout del teclado: de ahí salen las posiciones
+           de las teclas que el lienzo usa para que cada nota caiga sobre su tecla. */
         var wW = (kbEl.clientWidth || 300) / whiteCount;
         var wi = 0, m;
         for (m = LOW; m <= HIGH; m++) {
@@ -1118,27 +1214,68 @@
         }
       }
 
+      /* Posición horizontal de un elemento en coordenadas de layout (sin
+         transformaciones): sirve para alinear el lienzo con el teclado aunque
+         tengan distinto ancho o el teclado tenga margen dentro de su tarjeta. */
+      function relLayoutX(el) {
+        var x = 0;
+        while (el) { x += el.offsetLeft || 0; el = el.offsetParent; }
+        return x;
+      }
+
       /* ============ Dibujo del escenario ============ */
       function draw() {
         var W = canvas.clientWidth || 300;
         var H = canvas.clientHeight || 200;
         ctx.clearRect(0, 0, W, H);
+        /* Desplazamiento del teclado respecto al lienzo: las notas caen EXACTO
+           sobre su tecla, como en Yousician, también en la vista normal donde
+           la tarjeta del teclado tiene relleno y el lienzo no. */
+        var kbX = relLayoutX(kbEl) - relLayoutX(canvas);
+        /* En la vista de lado el escenario se pinta azul oscuro con carriles
+           por tecla y la línea de toque brillando, como en la referencia. */
+        var inPlay = playActive === true;
+        if (inPlay) {
+          var bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+          bgGrad.addColorStop(0, "#1d33a5");
+          bgGrad.addColorStop(0.55, "#122379");
+          bgGrad.addColorStop(1, "#0a1553");
+          ctx.fillStyle = bgGrad;
+          ctx.fillRect(0, 0, W, H);
+        }
         /* carriles de las teclas blancas */
-        var m;
-        ctx.fillStyle = "rgba(255,255,255,0.025)";
+        var m, wi = 0;
         for (m = LOW; m <= HIGH; m++) {
           if (isBlack(m)) continue;
           var g = keyGeo[m]; if (!g) continue;
-          if ((m / 12) % 2 === 0) ctx.fillRect(g.x, 0, g.w, H);
+          if (inPlay) {
+            if (wi % 2 === 0) { ctx.fillStyle = "rgba(4,8,38,0.22)"; ctx.fillRect(kbX + g.x, 0, g.w, H); }
+            ctx.fillStyle = "rgba(130,165,255,0.13)";
+            ctx.fillRect(kbX + g.x, 0, 1, H);
+          } else if ((m / 12) % 2 === 0) {
+            ctx.fillStyle = "rgba(255,255,255,0.025)";
+            ctx.fillRect(kbX + g.x, 0, g.w, H);
+          }
+          wi++;
         }
         /* línea de toque */
-        ctx.strokeStyle = "#e8a33d"; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.moveTo(0, hitY); ctx.lineTo(W, hitY); ctx.stroke();
-        ctx.fillStyle = "rgba(232,163,61,0.08)";
-        ctx.fillRect(0, hitY, W, H - hitY);
+        if (inPlay) {
+          ctx.save();
+          ctx.shadowColor = "rgba(140,175,255,0.95)"; ctx.shadowBlur = 16;
+          ctx.strokeStyle = "#dceaff"; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(0, hitY); ctx.lineTo(W, hitY); ctx.stroke();
+          ctx.restore();
+          ctx.fillStyle = "rgba(120,160,255,0.10)";
+          ctx.fillRect(0, hitY, W, H - hitY);
+        } else {
+          ctx.strokeStyle = "#e8a33d"; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(0, hitY); ctx.lineTo(W, hitY); ctx.stroke();
+          ctx.fillStyle = "rgba(232,163,61,0.08)";
+          ctx.fillRect(0, hitY, W, H - hitY);
+        }
 
         if (mode === "free") {
-          ctx.fillStyle = "#8d8168";
+          ctx.fillStyle = inPlay ? "#c3d2ff" : "#8d8168";
           ctx.font = "600 15px Manrope, sans-serif";
           ctx.textAlign = "center";
           ctx.fillText("Modo libre: toca lo que quieras, el piano es tuyo.", W / 2, H / 2);
@@ -1151,7 +1288,7 @@
           var yTop = hitY - (n.start - songTime) * PX_PER_BEAT - n.beats * PX_PER_BEAT * 0.82;
           var h = Math.max(36, n.beats * PX_PER_BEAT * 0.82 - 6);
           if (yTop > hitY + 10 || yTop + h < -10) continue;
-          var x = g2.x + 1.5, w = g2.w - 3;
+          var x = kbX + g2.x + 1.5, w = g2.w - 3;
           var isCurrent = (mode === "practice" && i === currentIdx);
           var leftHand = n.midi < 60; /* como en Yousician: cada mano con su color */
           if (n.state === "hit") ctx.fillStyle = "#57c785";
@@ -1216,6 +1353,13 @@
           }
         }
         metroTick();
+        if (playActive) {
+          var want = running ? "⏸ Pausa" : (mode === "free" ? "▶ Empezar" : "▶ Seguir");
+          var miniBtn = document.getElementById("playPauseMini");
+          if (miniBtn && miniBtn.textContent !== want) miniBtn.textContent = want;
+          var footBtn = document.getElementById("playPauseFoot");
+          if (footBtn && footBtn.textContent !== want) footBtn.textContent = want;
+        }
         draw();
         requestAnimationFrame(loop);
       }
@@ -1286,6 +1430,10 @@
         var pct = SONG.length ? Math.round((hits / SONG.length) * 100) : 0;
         document.getElementById("progressFill").style.width = pct + "%";
         document.getElementById("progressLabel").textContent = "Nota " + hits + " de " + SONG.length;
+        var pf = document.getElementById("playProgressFill");
+        if (pf) pf.style.width = pct + "%";
+        var pc = document.getElementById("playCounter");
+        if (pc) pc.textContent = hits + "/" + SONG.length;
       }
       function resetSong() {
         songTime = 0; currentIdx = 0; hits = 0; misses = 0;
@@ -1325,7 +1473,7 @@
           xp += 5; level = 1 + Math.floor(xp / 120); updateHud();
         } else {
           var stars = misses === 0 ? 3 : (misses <= 4 ? 2 : 1);
-          /* Estrellas, XP y nivel de la sesión, como en Simply Piano y Yousician */
+          /* Estrellas, XP y nivel de la sesión, como en Yousician */
           var prevStars = starsByEntry[currentEntry.id] || 0;
           if (stars > prevStars) starsByEntry[currentEntry.id] = stars;
           xp += 10 + stars * 10 + SONG.length;
@@ -1397,7 +1545,7 @@
       /* Etiquetas en teclas */
       var labelsBtn = document.getElementById("labelsBtn");
 
-      /* Vista de práctica a pantalla completa (de lado, tipo Simply Piano / Yousician):
+      /* Vista de práctica a pantalla completa (de lado, tipo Yousician):
          mueve el escenario y el teclado a una capa que ocupa toda la pantalla,
          con las notas cayendo directo sobre las teclas. */
       var playShell = document.getElementById("playShell");
@@ -1413,16 +1561,13 @@
         setTimeout(resizeCanvas, 300);
         setTimeout(resizeCanvas, 650);
       }
-      /* La clave de esta versión: la vista NO depende de que el sistema gire la
-         pantalla. Si el viewport sigue en vertical al entrar (rotación bloqueada
-         en el teléfono, o la app abierta dentro de un visor que no rota), la capa
-         se gira 90° con CSS y el usuario solo voltea el teléfono. Si el sistema
-         sí gira a horizontal, el giro forzado se quita solo. */
-      function syncPlayRotation() {
-        if (!playActive) return;
-        var portrait = window.innerHeight > window.innerWidth;
-        playShell.classList.toggle("force-rotated", portrait);
-      }
+      /* Vista de lado SIN giro CSS: la capa ocupa la pantalla tal cual es. Si el
+         teléfono ya está en horizontal, el diseño horizontal (barra fina arriba,
+         notas cayendo, teclado abajo a todo lo ancho con zoom a la canción) se
+         ve derecho y legible, como en Yousician. Si el teléfono sigue en
+         vertical, la capa muestra el aviso "Gira tu teléfono" (.rotate-gate,
+         controlado por CSS según la orientación real) en vez de contenido
+         torcido, y en cuanto el teléfono gira el juego aparece acomodado. */
       function enterPlayMode() {
         if (playActive) return;
         playActive = true;
@@ -1432,11 +1577,12 @@
         playShell.hidden = false;
         document.body.classList.add("playing");
         orientationBtn.textContent = "✕ Salir de la vista de lado";
-        syncPlayRotation();
+        zoomKeyboardToSong();
+        syncHandGuides();
         /* Pantalla completa real y bloqueo horizontal SOLO como mejora cuando el
-           navegador lo permite (Chrome/Android/PC). Si lo rechaza — iPhone, o la
-           app dentro del visor de Muse — no pasa nada: el giro CSS de arriba ya
-           dejó la vista de lado, que es lo que se ve. */
+           navegador lo permite (Chrome/Android: ahí sí puede forzar el giro del
+           viewport aunque la rotación esté bloqueada). En iPhone no existe y no
+           pasa nada: manda el giro físico del teléfono y el aviso de girar. */
         try {
           var fsEl = document.documentElement;
           var req = fsEl.requestFullscreen || fsEl.webkitRequestFullscreen;
@@ -1454,12 +1600,12 @@
       function exitPlayMode() {
         if (!playActive) return;
         playActive = false;
-        playShell.classList.remove("force-rotated");
         stageHome.parent.insertBefore(stageCardEl, stageHome.next);
         kbHome.parent.insertBefore(keyboardCardEl, kbHome.next);
         playShell.hidden = true;
         document.body.classList.remove("playing");
         orientationBtn.textContent = "⛶ Tocar de lado (pantalla completa)";
+        restoreFullKeyboard();
         if (screen.orientation && screen.orientation.unlock) { try { screen.orientation.unlock(); } catch (e) {} }
         if (document.fullscreenElement) { try { document.exitFullscreen().catch(function () {}); } catch (e) {} }
         refreshPlayLayout();
@@ -1468,16 +1614,19 @@
         if (playActive) exitPlayMode(); else enterPlayMode();
       });
       document.getElementById("playExitBtn").addEventListener("click", exitPlayMode);
+      document.getElementById("gateExitBtn").addEventListener("click", exitPlayMode);
+      document.getElementById("playPauseMini").addEventListener("click", function () { playPauseBtn.click(); });
+      document.getElementById("playPauseFoot").addEventListener("click", function () { playPauseBtn.click(); });
       /* Salir de pantalla completa ya NO expulsa de la vista de lado: en iPhone y
-         en visores la pantalla completa ni siquiera existe, y antes el aviso de
-         "sin pantalla completa + vertical" cerraba la vista apenas se abría. */
+         en visores la pantalla completa ni siquiera existe. */
       document.addEventListener("fullscreenchange", function () { refreshPlayLayout(); });
       document.addEventListener("webkitfullscreenchange", function () { refreshPlayLayout(); });
       /* Al girar el teléfono de lado, la vista de práctica entra sola, como en
-         Simply Piano; y estando dentro, cada giro reacomoda el giro forzado. */
+         Yousician; y estando dentro, cada giro solo reacomoda tamaños (el
+         aviso de girar entra y sale solo por CSS según la orientación). */
       function onViewportTurn() {
         setTimeout(function () {
-          if (playActive) { syncPlayRotation(); resizeCanvas(); return; }
+          if (playActive) { resizeCanvas(); return; }
           var side = window.matchMedia("(orientation: landscape) and (max-height: 560px)").matches;
           if (side) enterPlayMode();
           else resizeCanvas();
@@ -1487,7 +1636,7 @@
       if (screen.orientation && screen.orientation.addEventListener) {
         screen.orientation.addEventListener("change", onViewportTurn);
       }
-      window.addEventListener("resize", function () { if (playActive) syncPlayRotation(); });
+      window.addEventListener("resize", function () { if (playActive) resizeCanvas(); });
       labelsBtn.addEventListener("click", function () {
         var off = document.body.classList.toggle("no-labels");
         labelsBtn.textContent = "Letras en teclas: " + (off ? "No" : "Sí");
@@ -1558,11 +1707,21 @@
         mk("Toda", -1);
         PHRASES.forEach(function (ph, i) { mk("Frase " + (i + 1), i); });
       }
+      /* Guía de manos de la barra inferior de la vista de lado: se enciende la
+         mano (o las dos) que estás practicando tú. */
+      function syncHandGuides() {
+        var l = document.getElementById("hgLeft");
+        var r = document.getElementById("hgRight");
+        if (!l || !r) return;
+        l.classList.toggle("on", handFilter === "both" || handFilter === "left");
+        r.classList.toggle("on", handFilter === "both" || handFilter === "right");
+      }
       document.querySelectorAll("[data-hand]").forEach(function (btn) {
         btn.addEventListener("click", function () {
           handFilter = btn.getAttribute("data-hand");
           document.querySelectorAll("[data-hand]").forEach(function (b) { b.classList.toggle("active", b === btn); });
           applyFilters();
+          syncHandGuides();
           setFeedback(handFilter === "both" ? "Practicando con las dos manos." : "Practicando solo la mano " + (handFilter === "right" ? "derecha" : "izquierda") + ": las notas de la otra mano (en gris) las toca la app.", "");
         });
       });
@@ -1692,6 +1851,7 @@
         renderSheet();
         renderTestButtons();
         updateSongRange();
+        if (playActive) { document.getElementById("playTitle").textContent = entry.title; zoomKeyboardToSong(); refreshPlayLayout(); }
         markActiveCard();
         setMode("practice");
         setFeedback("Cargado: «" + entry.title + "». Toca «Empezar» cuando quieras.", "");
