@@ -1,0 +1,32 @@
+{
+  "background_color": "#0e4d4a",
+  "description": "Aprende piano desde cero: canciones y lecciones con notas que caen, mano derecha e izquierda, y conexión MIDI.",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "lang": "es",
+  "name": "Olivia Piano",
+  "orientation": "any",
+  "scope": ".",
+  "short_name": "Olivia Piano",
+  "start_url": ".",
+  "theme_color": "#0e4d4a"
+}
